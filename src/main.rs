@@ -1,11 +1,13 @@
 use std::{error::Error, process};
 
+mod add_styling;
 mod banner;
 mod cli;
 mod constants;
 mod create_project;
 mod git;
 pub mod logger;
+mod project_path;
 mod scafold_project;
 
 use cli::Config;
@@ -26,7 +28,8 @@ impl App {
 
     fn run(&self) -> AppResult<()> {
         self.scaffold_project()?;
-
+        Logger::info("Adding boilerplate...");
+            self.add_styling()?;
         if self.config.initialize_git {
             git::initialize_git();
         }
@@ -36,6 +39,10 @@ impl App {
 
     fn scaffold_project(&self) -> AppResult<()> {
         scafold_project::run(&self.config.project_name)
+    }
+
+    fn add_styling(&self) -> AppResult<()> {
+        add_styling::run(&self.config.project_name,&self.config.styling_with_tailwind)
     }
 }
 

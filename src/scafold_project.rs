@@ -1,5 +1,4 @@
 use console::Style;
-use spinners::{Spinner, Spinners};
 use std::{
     env::{self},
     error::Error,
@@ -8,7 +7,7 @@ use std::{
     process,
 };
 
-use crate::{constants, logger::Logger};
+use crate::{constants, logger::Logger, project_path::PathConfig};
 use dialoguer::{theme::ColorfulTheme, Select};
 use owo_colors::OwoColorize;
 
@@ -22,11 +21,8 @@ struct ProjectConfig {
 impl ProjectConfig {
     fn new(app_name: &String) -> Result<Self, Box<dyn Error>> {
         let current_dir = env::current_dir()?;
-        let path = match app_name.as_str() {
-            "." => &current_dir,
-            _ => &current_dir.join(&app_name),
-        };
-        let name = path
+        let project_path = PathConfig::new(app_name)?;
+        let name = project_path
             .file_name()
             .map_or(String::from(app_name), |n| n.to_string_lossy().to_string());
         let theme = ColorfulTheme {
@@ -36,7 +32,7 @@ impl ProjectConfig {
 
         let template_dir = current_dir.join(constants::TEMPLATE_DIR);
         Ok(Self {
-            path: path.to_path_buf(),
+            path: project_path.to_path_buf(),
             name,
             theme,
             template_dir,

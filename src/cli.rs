@@ -13,7 +13,6 @@ const DEFAULT_IMPORT_ALIAS: &str = "~/";
 pub struct Config {
     pub project_name: String,
     pub styling_with_tailwind: bool,
-    pub set_up_shadcn: bool,
     pub initialize_git: bool,
     pub import_alias: String,
 }
@@ -24,11 +23,6 @@ impl Config {
         let project_name = Self::get_project_name(&theme)?;
         let styling_with_tailwind =
             Self::prompt_yes_no(&theme, "Will you be using Tailwind CSS for styling?")?;
-        let set_up_shadcn = if styling_with_tailwind {
-            Self::prompt_yes_no(&theme, "Will you be using Shadcn?")?
-        } else {
-            false
-        };
         let initialize_git = Self::prompt_yes_no(
             &theme,
             "Should we initialize a Git repository and stage the changes?",
@@ -39,7 +33,6 @@ impl Config {
             project_name,
             styling_with_tailwind,
             initialize_git,
-            set_up_shadcn,
             import_alias,
         })
     }
@@ -77,6 +70,13 @@ impl Config {
         Input::with_theme(theme)
             .with_prompt(" What import alias would you like to use? \n")
             .with_initial_text(DEFAULT_IMPORT_ALIAS)
+            .validate_with(|input: &String| -> Result<(), &str> {
+                if input.starts_with(&['.', '/']) {
+                    Err("Import alias can't start with '.' or '/'")
+                } else {
+                    Ok(())
+                }
+            })
             .interact_text()
             .map_err(Into::into)
     }
