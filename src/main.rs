@@ -2,6 +2,7 @@ use std::{error::Error, process};
 
 mod banner;
 mod cli;
+mod constants;
 mod create_project;
 mod git;
 pub mod logger;
@@ -24,7 +25,6 @@ impl App {
     }
 
     fn run(&self) -> AppResult<()> {
-        Logger::info("Scaffolding app");
         self.scaffold_project()?;
 
         if self.config.initialize_git {

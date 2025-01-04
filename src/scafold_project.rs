@@ -1,22 +1,22 @@
 use console::Style;
+use spinners::{Spinner, Spinners};
 use std::{
     env::{self},
     error::Error,
     fs,
-    path::PathBuf,
+    path::{Path, PathBuf},
     process,
 };
 
+use crate::{constants, logger::Logger};
 use dialoguer::{theme::ColorfulTheme, Select};
 use owo_colors::OwoColorize;
 
-const OVERWRITE_OPTIONS: [&str; 2] = ["abort", "clear"];
-const CONFIRM_OPTIONS: [&str; 2] = ["Yes", "No"];
-
-pub struct ProjectConfig {
-    pub path: PathBuf,
-    pub name: String,
-    pub theme: ColorfulTheme,
+struct ProjectConfig {
+    path: PathBuf,
+    name: String,
+    theme: ColorfulTheme,
+    template_dir: PathBuf,
 }
 
 impl ProjectConfig {
@@ -33,10 +33,13 @@ impl ProjectConfig {
             values_style: Style::new().cyan().dim(),
             ..ColorfulTheme::default()
         };
+
+        let template_dir = current_dir.join(constants::TEMPLATE_DIR);
         Ok(Self {
             path: path.to_path_buf(),
             name,
             theme,
+            template_dir,
         })
     }
 
@@ -67,7 +70,7 @@ impl ProjectConfig {
                 format!("{}", String::from("Warning:").red().bold()),
                 &self.name.cyan().bold()
             ))
-            .items(&OVERWRITE_OPTIONS)
+            .items(&constants::OVERWRITE_OPTIONS)
             .default(0)
             .interact()
             .map_err(Into::into)
@@ -77,7 +80,7 @@ impl ProjectConfig {
         println!("Clear the directory and continue installation");
         match Select::with_theme(&self.theme)
             .with_prompt("Are you sure you want to clear the directory?")
-            .items(&CONFIRM_OPTIONS)
+            .items(&constants::CONFIRM_OPTIONS)
             .default(1) // Default to the first option ("No")
             .interact()?
         {
@@ -97,10 +100,35 @@ impl ProjectConfig {
         println!("{}", "Aborting installation...".red().bold());
         process::exit(0);
     }
+
+    fn copy_directory(&self, source: &Path, destination: &Path) -> Result<(), Box<dyn Error>> {
+        if !destination.try_exists().unwrap() {
+            fs::create_dir(destination)?
+        }
+        for entry in fs::read_dir(source)? {
+            let entry = entry?;
+            let entry_path = entry.path();
+            let dist_path = destination.join(entry.file_name());
+
+            if entry_path.is_dir() {
+                self.copy_directory(&entry_path, &dist_path)?;
+            } else {
+                fs::copy(&entry_path, &dist_path)?;
+            }
+        }
+        Ok(())
+    }
 }
 
 pub fn run(app_name: &String) -> Result<(), Box<dyn Error>> {
     let config = ProjectConfig::new(app_name)?;
+    Logger::info(format!("Scafolding into {:?}", config.path).as_str());
     config.handle_existing_directory()?;
+    config.copy_directory(&config.template_dir, &config.path)?;
+    println!(
+        "{} {}",
+        config.name.cyan().bold(),
+        String::from("scaffolded successfully!").green()
+    );
     Ok(())
 }
