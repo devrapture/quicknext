@@ -1,8 +1,6 @@
 use std::{env, error::Error, path::PathBuf};
 
-pub struct PathConfig {
-    path: PathBuf,
-}
+pub struct PathConfig;
 
 impl PathConfig {
     pub fn new(app_name: &String) -> Result<PathBuf, Box<dyn Error>> {

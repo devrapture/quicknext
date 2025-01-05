@@ -5,17 +5,29 @@ use std::error::Error;
 use console::Style;
 use dialoguer::{theme::ColorfulTheme, Input, Select};
 
+use crate::utils::packages::PackagesEnum;
+
+
 const YES_NO_OPTIONS: [&str; 2] = ["Yes", "No"];
 const APP_NAME_PATTERN: &str = r"^[a-z0-9_-]+$|^\.$";
 const DEFAULT_IMPORT_ALIAS: &str = "~/";
+
 
 #[derive(Debug)]
 pub struct Config {
     pub project_name: String,
     pub styling_with_tailwind: bool,
+    pub trpc:bool,
+    pub app_router:bool,
+    // pub next_auth:bool,
+    // pub orm:Orm,
     pub initialize_git: bool,
     pub import_alias: String,
+    pub packages: Vec<PackagesEnum>
 }
+
+
+
 
 impl Config {
     pub fn run() -> Result<Config, Box<dyn Error>> {
@@ -23,17 +35,35 @@ impl Config {
         let project_name = Self::get_project_name(&theme)?;
         let styling_with_tailwind =
             Self::prompt_yes_no(&theme, "Will you be using Tailwind CSS for styling?")?;
+        let trpc = Self::prompt_yes_no(&theme, "Would you like to use tRPC?")?;
+        let app_router = Self::prompt_yes_no(&theme, " Would you like to use Next.js App Router?")?;
+        // let next_auth = Self::prompt_yes_no(&theme, " Would you like to use Next.js App Router?")?;
         let initialize_git = Self::prompt_yes_no(
             &theme,
             "Should we initialize a Git repository and stage the changes?",
         )?;
 
         let import_alias = Self::get_import_alias(&theme)?;
+
+        let mut packages = Vec::new();
+        if  styling_with_tailwind{
+            packages.push(PackagesEnum::Tailwind);
+        }
+        if trpc {
+            packages.push(PackagesEnum::Trpc);
+        }
+        if  app_router{
+            packages.push(PackagesEnum::AppRouter);
+        }
         Ok(Config {
             project_name,
             styling_with_tailwind,
+            trpc,
+            app_router,
+            // next_auth,
             initialize_git,
             import_alias,
+            packages,
         })
     }
 

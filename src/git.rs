@@ -1,5 +1,6 @@
-use crate::logger::Logger;
 use std::process::Command;
+
+use crate::utils::Logger;
 
 pub fn initialize_git() {
     Logger::info("Initializing Git...");

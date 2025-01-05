@@ -1,17 +1,18 @@
 use std::{error::Error, process};
 
-mod add_styling;
 mod banner;
 mod cli;
 mod constants;
-mod create_project;
 mod git;
-pub mod logger;
-mod project_path;
 mod scafold_project;
+mod install_packages;
+pub mod utils;
+pub mod installers;
+
 
 use cli::Config;
-use logger::Logger;
+use installers::installer::PackageInstaller;
+use utils::Logger;
 
 type AppResult<T> = Result<T, Box<dyn Error>>;
 
@@ -27,9 +28,10 @@ impl App {
     }
 
     fn run(&self) -> AppResult<()> {
+        let use_packages = PackageInstaller::build_pkg_installer_map(&self.config.packages);
         self.scaffold_project()?;
-        Logger::info("Adding boilerplate...");
-            self.add_styling()?;
+        install_packages::run(&use_packages,&self.config.project_name)?;
+            // self.add_styling()?;
         if self.config.initialize_git {
             git::initialize_git();
         }
@@ -41,9 +43,9 @@ impl App {
         scafold_project::run(&self.config.project_name)
     }
 
-    fn add_styling(&self) -> AppResult<()> {
-        add_styling::run(&self.config.project_name,&self.config.styling_with_tailwind)
-    }
+    // fn add_styling(&self) -> AppResult<()> {
+    //     add_styling::run(&self.config.project_name,&self.config.styling_with_tailwind)
+    // }
 }
 
 fn main() {

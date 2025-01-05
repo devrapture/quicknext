@@ -7,7 +7,7 @@ use std::{
     process,
 };
 
-use crate::{constants, logger::Logger, project_path::PathConfig};
+use crate::{constants, utils::{Logger, PathConfig}};
 use dialoguer::{theme::ColorfulTheme, Select};
 use owo_colors::OwoColorize;
 
