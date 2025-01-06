@@ -4,11 +4,10 @@ mod banner;
 mod cli;
 mod constants;
 mod git;
-mod scafold_project;
 mod install_packages;
-pub mod utils;
 pub mod installers;
-
+mod scafold_project;
+pub mod utils;
 
 use cli::Config;
 use installers::installer::PackageInstaller;
@@ -30,8 +29,8 @@ impl App {
     fn run(&self) -> AppResult<()> {
         let use_packages = PackageInstaller::build_pkg_installer_map(&self.config.packages);
         self.scaffold_project()?;
-        install_packages::run(&use_packages,&self.config.project_name)?;
-            // self.add_styling()?;
+        install_packages::run(&use_packages, &self.config.project_name)?;
+        // self.add_styling()?;
         if self.config.initialize_git {
             git::initialize_git();
         }

@@ -1,11 +1,17 @@
-use std::{env, error::Error, fs};
+use std::{env, error::Error};
 
 use owo_colors::OwoColorize;
 
 use crate::{
     constants,
     installers::installer::PackageInstallerMap,
-    utils::{copy_file, select_boiler_plate::{select_app_file, select_index_file, select_layout_file, select_page_file}, Logger, PackagesEnum, PathConfig},
+    utils::{
+        copy_file,
+        select_boiler_plate::{
+            select_app_file, select_index_file, select_layout_file, select_page_file,
+        },
+        Logger, PackagesEnum, PathConfig,
+    },
 };
 
 pub fn run(packages: &PackageInstallerMap, project_name: &String) -> Result<(), Box<dyn Error>> {
@@ -46,7 +52,7 @@ pub fn run(packages: &PackageInstallerMap, project_name: &String) -> Result<(), 
     if packages.get(&PackagesEnum::AppRouter).unwrap().in_use {
         select_layout_file(&project_path, &packages)?;
         select_page_file(&project_path, &packages)?;
-    }else{
+    } else {
         select_app_file(&project_path, &packages)?;
         select_index_file(&project_path, &packages)?;
     }
