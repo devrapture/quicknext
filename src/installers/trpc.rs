@@ -1,13 +1,14 @@
+// TODO fix
 use std::{env, error::Error, fs, path::PathBuf};
 
 use crate::{constants, utils::PathConfig};
 
-pub struct AppRouterConfig {
+pub struct TrpcConfig {
     pub template_root: PathBuf,
     pub project_root: PathBuf,
 }
 
-impl AppRouterConfig {
+impl TrpcConfig {
     pub fn new(project_name:&String) -> Result<Self, Box<dyn Error>> {
         let current_dir = env::current_dir()?;
         let project_path = PathConfig::new(&project_name)?;
@@ -32,7 +33,6 @@ impl AppRouterConfig {
 }
 
 pub fn install(project_name:&String) -> Result<(), Box<dyn Error>> {
-    let app_router_config = AppRouterConfig::new(project_name)?;
-    app_router_config.copy_file(&app_router_config.template_root, &app_router_config.project_root)?;
+println!("{}",project_name);
     Ok(())
 }

@@ -17,7 +17,7 @@ impl TailwindConfig {
         let current_dir = env::current_dir()?;
         let project_path = PathConfig::new(&project_name)?;
         Ok(Self {
-            template_root: current_dir.join(constants::EXTRAS_DIR),
+            template_root: current_dir.join(constants::EXTRAS_TEMPLATE_DIR),
             project_root: project_path,
         })
     }

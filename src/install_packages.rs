@@ -5,10 +5,12 @@ use owo_colors::OwoColorize;
 use crate::{
     constants,
     installers::installer::PackageInstallerMap,
-    utils::{Logger, PackagesEnum, PathConfig},
+    utils::{copy_file, select_boiler_plate::{select_index_file, select_layout_file, select_page_file}, Logger, PackagesEnum, PathConfig},
 };
 
 pub fn run(packages: &PackageInstallerMap, project_name: &String) -> Result<(), Box<dyn Error>> {
+    let current_dir = env::current_dir()?;
+    let project_path = PathConfig::new(project_name)?;
     Logger::info("Adding boilerplate...");
     for (k, v) in packages {
         if v.in_use {
@@ -24,36 +26,30 @@ pub fn run(packages: &PackageInstallerMap, project_name: &String) -> Result<(), 
 
     // If no tailwind, select use css modules
     if !packages.get(&PackagesEnum::Tailwind).unwrap().in_use {
-        let current_dir = env::current_dir()?;
-        let project_path = PathConfig::new(project_name)?;
-        let index_module_css = current_dir.join(constants::INDEX_MODULE_CSS_DIR);
-        let index_module_css_dest =  project_path.join("src").join(
-            if packages.get(&PackagesEnum::AppRouter).unwrap().in_use {
+        let index_module_css = current_dir.join(constants::INDEX_MODULE_CSS_TEMPLATE_DIR);
+        let index_module_css_dest = project_path
+            .join("src")
+            .join(if packages.get(&PackagesEnum::AppRouter).unwrap().in_use {
                 "app"
-            }else{
+            } else {
                 "pages"
-            }
-        ).join("index.module.css");
-        if let Some(parent) =  index_module_css_dest.parent(){
-            fs::create_dir_all(parent)?;
-        }
-        fs::copy(&index_module_css, &index_module_css_dest)?;
+            })
+            .join("index.module.css");
+        copy_file::run(&index_module_css, &index_module_css_dest)?;
+        // if let Some(parent) =  index_module_css_dest.parent(){
+        //     fs::create_dir_all(parent)?;
+        // }
+        // fs::copy(&index_module_css, &index_module_css_dest)?;
+    }
+
+    // Select necessary _app,index / layout,page files
+    if packages.get(&PackagesEnum::AppRouter).unwrap().in_use {
+        select_layout_file(&project_path, &packages)?;
+        select_page_file(&project_path, &packages)?;
+    }else{
+        select_page_file(&project_path, &packages)?;
+        select_index_file(&project_path, &packages)?;
     }
 
     Ok(())
 }
-
-
-// if (!packages.tailwind.inUse) {
-//     const indexModuleCss = path.join(
-//       PKG_ROOT,
-//       "template/extras/src/index.module.css"
-//     );
-//     const indexModuleCssDest = path.join(
-//       projectDir,
-//       "src",
-//       appRouter ? "app" : "pages",
-//       "index.module.css"
-//     );
-//     fs.copyFileSync(indexModuleCss, indexModuleCssDest);
-//   }

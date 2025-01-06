@@ -3,4 +3,5 @@ pub enum PackagesEnum {
     Tailwind,
     AppRouter,
     Trpc,
+    NextAuth
 }
