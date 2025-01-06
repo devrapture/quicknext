@@ -7,7 +7,10 @@ use std::{
     process,
 };
 
-use crate::{constants, utils::{Logger, PathConfig}};
+use crate::{
+    constants,
+    utils::{Logger, PathConfig},
+};
 use dialoguer::{theme::ColorfulTheme, Select};
 use owo_colors::OwoColorize;
 
@@ -114,6 +117,12 @@ impl ProjectConfig {
         }
         Ok(())
     }
+    fn rename_gitignore_file(&self, old: &str, new: &str) -> Result<(), Box<dyn Error>> {
+        let old_file = self.path.join(old);
+        let new_file = self.path.join(new);
+        fs::rename(&old_file, &new_file)?;
+        Ok(())
+    }
 }
 
 pub fn run(app_name: &String) -> Result<(), Box<dyn Error>> {
@@ -121,6 +130,7 @@ pub fn run(app_name: &String) -> Result<(), Box<dyn Error>> {
     Logger::info(format!("Scafolding into {:?}", config.path).as_str());
     config.handle_existing_directory()?;
     config.copy_directory(&config.template_dir, &config.path)?;
+    config.rename_gitignore_file("_gitignore",".gitignore")?;
     println!(
         "{} {}",
         config.name.cyan().bold(),
