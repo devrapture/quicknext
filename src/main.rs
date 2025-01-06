@@ -11,7 +11,7 @@ pub mod utils;
 
 use cli::Config;
 use installers::installer::PackageInstaller;
-use utils::Logger;
+use utils::{rename_project, Logger};
 
 type AppResult<T> = Result<T, Box<dyn Error>>;
 
@@ -29,6 +29,7 @@ impl App {
     fn run(&self) -> AppResult<()> {
         let use_packages = PackageInstaller::build_pkg_installer_map(&self.config.packages);
         self.scaffold_project()?;
+        rename_project(&self.config.project_name)?;
         install_packages::run(&use_packages, &self.config.project_name)?;
         // self.add_styling()?;
         if self.config.initialize_git {
@@ -42,9 +43,6 @@ impl App {
         scafold_project::run(&self.config.project_name)
     }
 
-    // fn add_styling(&self) -> AppResult<()> {
-    //     add_styling::run(&self.config.project_name,&self.config.styling_with_tailwind)
-    // }
 }
 
 fn main() {
