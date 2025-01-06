@@ -53,30 +53,83 @@ impl FileConfig {
         .to_owned();
     }
 
+    // for select app file
+    fn determine_file_name_app(&mut self, packages: &PackageInstallerMap) {
+        let using_tailwind = packages.get(&PackagesEnum::Tailwind).unwrap().in_use;
+        let using_trpc = packages.get(&PackagesEnum::Trpc).unwrap().in_use;
+        let using_auth = packages.get(&PackagesEnum::NextAuth).unwrap().in_use;
+
+        self.file_name = match (using_trpc, using_tailwind, using_auth) {
+            (true, true, true) => "with-auth-trpc-tw.tsx",
+            (true, false, true) => "with-auth-trpc.tsx",
+            (true, true, false) => "with-trpc-tw.tsx",
+            (true, false, false) => "with-trpc.tsx",
+            (false, true, false) => "with-tw.tsx",
+            (false, true, true) => "with-auth-tw.tsx",
+            (false, false, true) => "with-auth.tsx",
+            _ => "base.tsx", // Default case if none of the above match
+        }
+        .to_owned();
+    }
+
     fn copy(&self) -> Result<(), Box<dyn Error>> {
         copy_file::run(&self.template_dir.join(&self.file_name), &self.dest_path)?;
         Ok(())
     }
 }
 
-pub fn select_layout_file( project_dir: &PathBuf,packages: &PackageInstallerMap) -> Result<(), Box<dyn Error>> {
-    let mut file_config = FileConfig::new(project_dir, constants::LAYOUT_FILE_TEMPLATE_DIR, "src/app/layout.tsx")?;
+pub fn select_layout_file(
+    project_dir: &PathBuf,
+    packages: &PackageInstallerMap,
+) -> Result<(), Box<dyn Error>> {
+    let mut file_config = FileConfig::new(
+        project_dir,
+        constants::LAYOUT_FILE_TEMPLATE_DIR,
+        "src/app/layout.tsx",
+    )?;
     file_config.determine_file_name_layout(&packages);
     file_config.copy()?;
     Ok(())
 }
 
-pub fn select_page_file(project_dir: &PathBuf,packages: &PackageInstallerMap) -> Result<(), Box<dyn Error>> {
-    let mut file_config = FileConfig::new(project_dir, "template/extras/src/pages/index", "src/app/page.tsx")?;
+pub fn select_page_file(
+    project_dir: &PathBuf,
+    packages: &PackageInstallerMap,
+) -> Result<(), Box<dyn Error>> {
+    let mut file_config = FileConfig::new(
+        project_dir,
+        "template/extras/src/pages/index",
+        "src/app/page.tsx",
+    )?;
     file_config.determine_file_name(packages);
     file_config.copy()?;
     Ok(())
 }
 
-pub fn select_index_file( project_dir: &PathBuf,packages: &PackageInstallerMap) -> Result<(), Box<dyn Error>> {
-    let mut file_config = FileConfig::new(project_dir, "template/extras/src/pages/index", "src/pages/index.tsx")?;
-    file_config.determine_file_name(packages);
+pub fn select_app_file(
+    project_dir: &PathBuf,
+    packages: &PackageInstallerMap,
+) -> Result<(), Box<dyn Error>> {
+    let mut file_config = FileConfig::new(
+        project_dir,
+        "template/extras/src/pages/_app",
+        "src/pages/_app.tsx",
+    )?;
+    file_config.determine_file_name_app(packages);
     file_config.copy()?;
     Ok(())
 }
 
+pub fn select_index_file(
+    project_dir: &PathBuf,
+    packages: &PackageInstallerMap,
+) -> Result<(), Box<dyn Error>> {
+    let mut file_config = FileConfig::new(
+        project_dir,
+        "template/extras/src/pages/index",
+        "src/pages/index.tsx",
+    )?;
+    file_config.determine_file_name(packages);
+    file_config.copy()?;
+    Ok(())
+}
