@@ -2,7 +2,7 @@ use std::{collections::HashMap, error::Error};
 
 use crate::utils::PackagesEnum;
 
-use super::{app_router, next_auth, tailwind, trpc};
+use super::{app_router, tailwind};
 
 
 pub type PackageInstallerMap = HashMap<PackagesEnum, PackageInstaller>;
@@ -16,11 +16,9 @@ pub struct PackageInstaller{
 impl PackageInstaller {
     pub fn build_pkg_installer_map(packages:&Vec<PackagesEnum>) -> PackageInstallerMap{
         let mut map = HashMap::new();
-        let installers:[(PackagesEnum, bool, InstallerFn); 4] = [
+        let installers:[(PackagesEnum, bool, InstallerFn); 2] = [
             (PackagesEnum::Tailwind, packages.contains(&PackagesEnum::Tailwind), tailwind::install),
             (PackagesEnum::AppRouter, packages.contains(&PackagesEnum::AppRouter), app_router::install),
-            (PackagesEnum::Trpc, packages.contains(&PackagesEnum::Trpc), trpc::install),
-            (PackagesEnum::NextAuth, packages.contains(&PackagesEnum::NextAuth),next_auth::install)
         ];
         for (package, in_use, installer) in installers {
             map.insert(package, Self{
