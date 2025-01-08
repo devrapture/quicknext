@@ -8,7 +8,7 @@ pub struct AppRouterConfig {
 }
 
 impl AppRouterConfig {
-    pub fn new(project_name:&String) -> Result<Self, Box<dyn Error>> {
+    pub fn new(project_name: &String) -> Result<Self, Box<dyn Error>> {
         let current_dir = env::current_dir()?;
         let project_path = PathConfig::new(&project_name)?;
         Ok(Self {
@@ -17,7 +17,11 @@ impl AppRouterConfig {
         })
     }
 
-    pub fn copy_file(&self,src_relative_path: &PathBuf, dest_relative_path: &PathBuf) -> Result<(), Box<dyn Error>> {
+    pub fn copy_file(
+        &self,
+        src_relative_path: &PathBuf,
+        dest_relative_path: &PathBuf,
+    ) -> Result<(), Box<dyn Error>> {
         let source = self.template_root.join(src_relative_path);
         if !source.exists() {
             return Err("Source doesn't exist".into());
@@ -31,8 +35,11 @@ impl AppRouterConfig {
     }
 }
 
-pub fn install(project_name:&String) -> Result<(), Box<dyn Error>> {
+pub fn install(project_name: &String) -> Result<(), Box<dyn Error>> {
     let app_router_config = AppRouterConfig::new(project_name)?;
-    app_router_config.copy_file(&app_router_config.template_root, &app_router_config.project_root)?;
+    app_router_config.copy_file(
+        &app_router_config.template_root,
+        &app_router_config.project_root,
+    )?;
     Ok(())
 }

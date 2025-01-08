@@ -1,7 +1,7 @@
-#[derive(Debug, PartialEq,Eq,Hash)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub enum PackagesEnum {
     Tailwind,
     AppRouter,
     Trpc,
-    NextAuth
+    NextAuth,
 }

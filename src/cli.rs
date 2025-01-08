@@ -7,11 +7,9 @@ use dialoguer::{theme::ColorfulTheme, Input, Select};
 
 use crate::utils::packages::PackagesEnum;
 
-
 const YES_NO_OPTIONS: [&str; 2] = ["Yes", "No"];
 const APP_NAME_PATTERN: &str = r"^[a-z0-9_-]+$|^\.$";
 const DEFAULT_IMPORT_ALIAS: &str = "~/";
-
 
 #[derive(Debug)]
 pub struct Config {
@@ -19,11 +17,8 @@ pub struct Config {
     pub styling_with_tailwind: bool,
     pub initialize_git: bool,
     pub import_alias: String,
-    pub packages: Vec<PackagesEnum>
+    pub packages: Vec<PackagesEnum>,
 }
-
-
-
 
 impl Config {
     pub fn run() -> Result<Config, Box<dyn Error>> {
@@ -40,10 +35,10 @@ impl Config {
         let import_alias = Self::get_import_alias(&theme)?;
 
         let mut packages = Vec::new();
-        if  styling_with_tailwind{
+        if styling_with_tailwind {
             packages.push(PackagesEnum::Tailwind);
         }
-        if  app_router{
+        if app_router {
             packages.push(PackagesEnum::AppRouter);
         }
         Ok(Config {

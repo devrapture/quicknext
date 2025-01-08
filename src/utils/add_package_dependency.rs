@@ -4,7 +4,6 @@ use crate::installers::get_dependency_version_map;
 
 use super::PackageJson;
 
-
 struct AddPackageDependency<'a> {
     dependencies: Vec<&'a str>,
     dev_mode: bool,

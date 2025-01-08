@@ -2,12 +2,7 @@ use crate::{
     constants,
     utils::{add_package_dependency, PackageJson, PathConfig},
 };
-use std::{
-    env::{self},
-    error::Error,
-    fs,
-    path::PathBuf,
-};
+use std::{env, error::Error, fs, path::PathBuf};
 
 pub struct TailwindConfig {
     pub template_root: PathBuf,

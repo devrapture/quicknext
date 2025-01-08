@@ -10,6 +10,7 @@ mod scafold_project;
 pub mod utils;
 
 use cli::Config;
+use git::{initialize_git, Git};
 use installers::installer::PackageInstaller;
 use utils::{rename_project, Logger};
 
@@ -31,9 +32,8 @@ impl App {
         self.scaffold_project()?;
         rename_project(&self.config.project_name)?;
         install_packages::run(&use_packages, &self.config.project_name)?;
-        // self.add_styling()?;
         if self.config.initialize_git {
-            git::initialize_git();
+            initialize_git(&self.config.project_name)?;
         }
 
         Ok(())
@@ -42,7 +42,6 @@ impl App {
     fn scaffold_project(&self) -> AppResult<()> {
         scafold_project::run(&self.config.project_name)
     }
-
 }
 
 fn main() {

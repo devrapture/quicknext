@@ -130,7 +130,7 @@ pub fn run(app_name: &String) -> Result<(), Box<dyn Error>> {
     Logger::info(format!("Scafolding into {:?}", config.path).as_str());
     config.handle_existing_directory()?;
     config.copy_directory(&config.template_dir, &config.path)?;
-    config.rename_gitignore_file("_gitignore",".gitignore")?;
+    config.rename_gitignore_file("_gitignore", ".gitignore")?;
     println!(
         "{} {}",
         config.name.cyan().bold(),
